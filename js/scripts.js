@@ -54,26 +54,24 @@ var Player = function( x, y, imgSrc, altImgSrc ) {
 
 Player.prototype.animate = function() {
     
+    for ( var i = 0; i < this.hurdles.length; i++ ) {
+        this.hurdles[i].draw()
+    }
+    
     var collision = false;
-    // to do
-        // loop through the hurdles here
-        // then perhaps optimize by only checking the next hurdle (because we know where we are in the race)
+
     do { // we always want to check for a collision at least once
-        
-        // for hurdle in hurdles
-            // if this.x > hurdle.x && this.x < hurdle.x+hurdle.width && this.isGrounded
-            
-        if ( this.x > 100 && this.x < 130 && this.isGrounded ) {
-            collision = true;
-            this.x -= steps; // we are always moving right, so push the player left
-        } else {
+        for (var i = 0; i < this.hurdles.length; i++) {
+            if ( this.x > this.hurdles[i].x && this.x < this.hurdles[i].x + 30 && this.isGrounded ) {
+                collision = true;
+                this.x -= steps; // we are always moving right, so push the player left
+            } else {
             collision = false;
+            }
         }
     } while (collision);
 
-
-    // if the player is jumping or falling, move along the sine wave
-    if ( !this.isGrounded ) {
+    if ( !this.isGrounded ) { // if the player is jumping or falling, move along the sine wave
         var lastHeight = this.jumpSinWavePos; // the last position on the sine wave
         this.jumpSinWavePos += this.jumpSinWaveSpeed * dt; // the new position on the sine wave
 
@@ -91,24 +89,28 @@ Player.prototype.animate = function() {
     }
 };
 
-var Hurdle = function( x, y) {
-    /*
-    ctx.drawImage(hurdle,100, 84);
-	ctx.drawImage(hurdle,250, 84);
-	ctx.drawImage(hurdle,400, 84);
-	*/
+var Hurdle = function( x, y ) {
+    this.x = x;
+    this.y = y;
+    this.img = new Image();
+    this.img.src = 'images/hurdle.gif';
+    this.draw = function() {
+        ctx.drawImage( this.img, x, y );
+    }
 }
 
 var r1 = new Player(10, 80, 'images/runner1.png', 'images/runner1_2.png');
+r1.hurdles = [ new Hurdle( 100, 84 ), new Hurdle( 250, 84 ), new Hurdle( 400, 84 ) ];
 var r2 = new Player(10, 170, 'images/runner2.png', 'images/runner2_2.png');
+r2.hurdles = [ new Hurdle( 100, 174 ), new Hurdle( 250, 174 ), new Hurdle( 400, 174 ) ];
 
 var width = 600;
 var height = 241;
 var background = new Image();
 var hurdle = new Image();
 var finished = false;
-//var player1name = prompt('Player 1 - Enter your name');
-//var player2name = prompt('Player 2 - Enter your name');
+var player1name = prompt('Player 1 - Enter your name');
+var player2name = prompt('Player 2 - Enter your name');
 var player1name = '1';
 var player2name = '2';
 
@@ -126,7 +128,6 @@ var countdown = 4;
 ---------------------------------------*/
 
 background.src = 'images/bg.gif';
-hurdle.src = 'images/hurdle.gif'
 
 /* Functions
 ---------------------------------------*/
@@ -216,14 +217,6 @@ function draw() {
 	clearCanvas();
 	rect(0,0,width,height);
 	ctx.drawImage(background,0,0);
-	// track 1 hurdles
-	ctx.drawImage(hurdle,100, 84);
-	ctx.drawImage(hurdle,250, 84);
-	ctx.drawImage(hurdle,400, 84);
-	// track 2 hurdles
-	ctx.drawImage(hurdle,100, 174);
-	ctx.drawImage(hurdle,250, 174);
-	ctx.drawImage(hurdle,400, 174);
 	names();
 	framenumber++;
 	if (framenumber%100 === 0 && countdown){
